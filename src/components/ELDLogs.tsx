@@ -52,7 +52,7 @@ export const ELDLogs = ({ logs }: ELDLogsProps) => {
               <div className="flex items-center justify-between mb-3">
                 <h3 className="text-lg font-semibold">Day {log.day}</h3>
                 <span className="text-sm font-medium text-muted-foreground">
-                  Total Cycle: {log.cycleHoursUsed.toFixed(1)}h
+                  Total Cycle: {log.cycleHoursUsed}h
                 </span>
               </div>
               
@@ -94,6 +94,7 @@ export const ELDLogs = ({ logs }: ELDLogsProps) => {
             </div>
           ))}
         </div>
+        
       </CardContent>
     </Card>
   );

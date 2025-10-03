@@ -19,8 +19,18 @@ L.Marker.prototype.options.icon = DefaultIcon;
 
 interface MapViewProps {
   route: {
-    type: string;
-    coordinates: [number, number][];
+    type: "FeatureCollection";
+    features: Array<{
+      type: "Feature";
+      properties: Record<string, any>;
+      geometry: {
+        type: "LineString";
+        coordinates: [number, number][];
+      };
+      bbox?: [number, number, number, number];
+    }>;
+    bbox?: [number, number, number, number];
+    metadata?: Record<string, any>;
   };
   stops: Array<{
     type: string;
@@ -35,19 +45,38 @@ const MapController = ({ center }: { center: [number, number] }) => {
   const map = useMap();
   
   useEffect(() => {
-    map.setView(center, 7);
+    map.setView(center, 13);
   }, [center, map]);
   
   return null;
 };
 
 export const MapView = ({ route, stops }: MapViewProps) => {
-  const centerCoordinates: [number, number] = route.coordinates[0]
-    ? [route.coordinates[0][1], route.coordinates[0][0]]
-    : [37.7749, -122.4194];
 
-  const routePath: [number, number][] = route.coordinates.map(
-    (coord) => [coord[1], coord[0]]
+
+  //console.log(route)
+
+  const coords:[number,number][] =
+  route?.features?.[0]?.geometry?.coordinates?.map(
+    ([lng, lat]: [number, number]) => [lat, lng]
+  ) || [];
+
+  const centerCoordinates: [number, number] =
+  coords.length > 0 ? coords[0] : [37.7749, -122.4194];
+
+
+   coords.map((coords)=>{return console.log(coords);})
+  // INITIAL COORDINATES FOR THE MAP TO START AT
+  // const centerCoordinates: [number, number] = route.coordinates[0]
+  //   ? [route.coordinates[0][1], route.coordinates[0][0]]
+  //   : [37.7749, -122.4194];
+
+  // const routePath: [number, number][] = route.coordinates.map(
+  //   (coord) => [coord[1], coord[0]]
+  // );
+
+  const routePath: [number, number][] = coords.map(
+    (coord) => [coord[0], coord[1]]
   );
 
   const getMarkerColor = (type: string) => {
@@ -83,7 +112,7 @@ export const MapView = ({ route, stops }: MapViewProps) => {
         <div className="h-[500px] w-full rounded-b-lg overflow-hidden">
           <MapContainer
             {...{ center: centerCoordinates } as any}
-            {...{ zoom: 7 } as any}
+            {...{ zoom: 13 } as any}
             className="h-full w-full"
             {...{ scrollWheelZoom: true } as any}
           >
@@ -98,7 +127,7 @@ export const MapView = ({ route, stops }: MapViewProps) => {
               {...{ pathOptions: { color: "#2563eb", weight: 4, opacity: 0.7 } } as any}
             />
 
-            {stops.map((stop, index) => {
+            {/* {stops.map((stop, index) => {
               const markerIcon = createCustomIcon(stop.type);
               const position: [number, number] = [stop.coordinates[1], stop.coordinates[0]];
               return (
@@ -116,7 +145,7 @@ export const MapView = ({ route, stops }: MapViewProps) => {
                   </Popup>
                 </Marker>
               );
-            })}
+            })} */}
           </MapContainer>
         </div>
       </CardContent>

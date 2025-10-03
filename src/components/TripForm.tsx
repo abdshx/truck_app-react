@@ -1,4 +1,5 @@
 import { useState } from "react";
+import axios from "axios";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -20,52 +21,90 @@ export const TripForm = ({ onTripPlanned }: TripFormProps) => {
     cycleHoursUsed: "",
   });
 
+  // Geocode address to coordinates using Google Geocoding API
+  const geocodeAddress = async (address: string) => {
+    try {
+      const apiKey = import.meta.env.VITE_GOOGLE_MAP_API_KEY as string;
+      if (!apiKey) {
+        throw new Error('Missing VITE_GOOGLE_MAP_API_KEY in environment');
+      }
+      const url = `https://maps.googleapis.com/maps/api/geocode/json?address=${encodeURIComponent(address)}&key=${apiKey}`;
+  
+      const response = await axios.get(url);
+  
+      const data = response.data;
+  
+      if (data.status === "OK" && data.results.length > 0) {
+        const location = data.results[0].geometry.location;
+        return { lat: location.lat, lng: location.lng };
+      }
+  
+      throw new Error(`Geocoding failed: ${data.status}`);
+    } catch (err: any) {
+      console.error("Geocoding error for address:", address, err);
+      const message = err?.message || "Unknown error";
+      throw new Error(`Geocoding failed for "${address}": ${message}`);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
 
     try {
-      // Simulate API call to backend
-      // In production, this would be: const response = await fetch('/api/plan-trip', { method: 'POST', body: JSON.stringify(formData) })
+      // Geocode all addresses to coordinates
+      let start, pickup, dropoff,first,two;
+      try {
+        // Original geocoding calls (commented out)
+        /*
+        [start, pickup, dropoff] = await Promise.all([
+          geocodeAddress(formData.currentLocation),
+          geocodeAddress(formData.pickupLocation),
+          geocodeAddress(formData.dropoffLocation)
+        ]);
+        */
       
-      // Mock response data
-      await new Promise(resolve => setTimeout(resolve, 1000));
+        // Hardcoded coordinates instead of geocoding
+        start = { lat: 31.5820, lng: 74.3294 };     // Lahore city center
+        pickup = { lat: 31.5900, lng: 74.3200 };    // nearby point in Lahore
+        dropoff = { lat: 31.6000, lng: 74.3400 };   // another nearby point in Lahore   // nearby point
       
-      const mockResponse = {
-        route: {
-          type: "LineString",
-          coordinates: [
-            [-122.4194, 37.7749], // San Francisco
-            [-121.8863, 37.3382], // San Jose
-            [-118.2437, 34.0522], // Los Angeles
-          ]
-        },
-        stops: [
-          { type: "Pickup", location: formData.pickupLocation, duration: 1, day: 1, coordinates: [-122.4194, 37.7749] },
-          { type: "Driving", location: "I-5 South", duration: 8, day: 1, coordinates: [-121.8863, 37.3382] },
-          { type: "Fueling Stop", location: "Rest Area", duration: 0.5, day: 1, coordinates: [-120.5, 36.5] },
-          { type: "Rest", location: "Truck Stop", duration: 10, day: 1, coordinates: [-119.5, 35.5] },
-          { type: "Driving", location: "I-5 South", duration: 6, day: 2, coordinates: [-118.5, 34.5] },
-          { type: "Dropoff", location: formData.dropoffLocation, duration: 1, day: 2, coordinates: [-118.2437, 34.0522] },
-        ],
-        logs: [
-          { day: 1, driving: 8.5, rest: 10, cycleHoursUsed: parseFloat(formData.cycleHoursUsed) + 8.5 },
-          { day: 2, driving: 6, rest: 8, cycleHoursUsed: parseFloat(formData.cycleHoursUsed) + 14.5 },
-        ]
-      };
+      } catch (geoErr: any) {
+        toast({
+          title: "Geocoding failed",
+          description: geoErr?.message || "Could not resolve one or more addresses.",
+          variant: "destructive",
+        });
+        return;
+      }
 
-      onTripPlanned(mockResponse);
-      
-      toast({
-        title: "Trip Planned Successfully",
-        description: "Your route and stops have been calculated.",
-      });
-    } catch (error) {
-      toast({
-        title: "Error Planning Trip",
-        description: "Please try again later.",
-        variant: "destructive",
-      });
+      // Call Django backend
+      try {
+        const { data } = await axios.post('http://127.0.0.1:8000/api/plan-trip/', {
+          start,
+          pickup,
+          dropoff,
+          hours_used: parseFloat(formData.cycleHoursUsed)
+        });
+
+        
+         
+
+        
+        onTripPlanned(data);
+        
+        toast({
+          title: "Trip Planned Successfully",
+          description: "Your route and stops have been calculated.",
+        });
+      } catch (apiErr: any) {
+        toast({
+          title: "Backend request failed",
+          description: apiErr?.message || "Could not plan the trip.",
+          variant: "destructive",
+        });
+        return;
+      }
     } finally {
       setIsLoading(false);
     }
