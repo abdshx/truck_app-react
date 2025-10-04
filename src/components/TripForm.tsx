@@ -60,11 +60,11 @@ export const TripForm = ({ onTripPlanned }: TripFormProps) => {
       try {
         // Original geocoding calls (commented out)
         
-        [teststart, testpickup, testdropoff] = await Promise.all([
-          geocodeAddress(formData.currentLocation),
-          geocodeAddress(formData.pickupLocation),
-          geocodeAddress(formData.dropoffLocation)
-        ]);
+        // [teststart, testpickup, testdropoff] = await Promise.all([
+        //   geocodeAddress(formData.currentLocation),
+        //   geocodeAddress(formData.pickupLocation),
+        //   geocodeAddress(formData.dropoffLocation)
+        // ]);
         
       
         // Hardcoded coordinates instead of geocoding
