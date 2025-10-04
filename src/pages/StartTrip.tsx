@@ -125,6 +125,17 @@ const StartTrip = () => {
     setIsActivity(false);
   };
 
+
+
+//   perfect now lets move forward, we will integrate some backend functionality now and connect it with the frontend:
+
+// -> Firstly create  an Activity model with trip model's id as its foreign key and other attributes such as name, day number:int, duration:int , start time: time in GMT+5,  end time: time in GMT+5 .
+
+// // -> Secondly, When user clicks start driving, an api call should be made to the backend /api/GetDrivingHours which will be linked with  a function called getDrivingHours() which will get the total duration of all driving activities from the activity table anmd if it adds up to greather than 70 send a endtrip message to the frontend
+
+// -> Thirdly, when user clicks the end driving or end activity button an api call should be made at /api/addActivity, this api will be linked with a function called addActivity in the views.py file .In this function you should check the activity table to get the cumulative duration of all activities to figure out if 
+// if the day has changedi.e(day 2 has begun and day1 has ended) .Moreover, after this check the activity table should be populated with a new entry with the name, duration,daynumber start time m end time 
+//  with old day number and name, duration, start time, end time coming from the the frontend 
   // Clean up intervals on component unmount
   useEffect(() => {
     return () => {

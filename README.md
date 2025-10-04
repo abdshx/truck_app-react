@@ -1,22 +1,50 @@
-# Welcome to your Lovable project
+# Truck App Frontend
 
-## Project info
+## Project Description
 
-**URL**: https://lovable.dev/projects/4bd29cfa-0447-49f7-907f-74cd66109b1d
+This is the frontend for the Truck App, designed to assist truck drivers with trip planning, activity tracking, and compliance with driving regulations. It provides a user-friendly interface to manage routes, monitor driving and rest times, log activities like fueling, and receive important alerts.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- **Trip Planning**: Plan routes with specified start, pickup, and dropoff locations, visualizing the route on a map.
+- **Driving Activity Tracking**: Start and stop driving sessions, with real-time timers to accurately track driving duration.
+- **Activity Logging**: Record various activities such as fueling and rest stops. Each activity is logged with its type, duration, and associated start/end times.
+- **Refueling Alerts**: The system provides alerts if the distance covered since the previous stop exceeds 100 miles, prompting the driver to refuel.
+- **Driving Hour Limits**: Automatically checks cumulative driving hours against a 70-hour limit. If the limit is exceeded, the system notifies the driver that the trip must end.
+- **Day Management**: Automatically calculates and updates the day number based on cumulative activity duration, helping drivers manage their daily logs.
 
-**Use Lovable**
+## Getting Started
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4bd29cfa-0447-49f7-907f-74cd66109b1d) and start prompting.
+To run the frontend application, follow these steps:
 
-Changes made via Lovable will be committed automatically to this repo.
+### Prerequisites
 
-**Use your preferred IDE**
+- Node.js (LTS version recommended)
+- npm or Yarn (npm is used in these instructions)
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
+### Installation
+
+1. Navigate to the `truck_app_frontend` directory:
+   ```bash
+   cd truck_app_frontend
+   ```
+
+2. Install the necessary dependencies:
+   ```bash
+   npm install
+   ```
+
+### Running the Development Server
+
+To start the development server, run:
+
+```bash
+npm run dev
+```
+
+The application will typically be available at `http://localhost:8080` (or another port if 8080 is in use).
+
+
 
 The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
 
@@ -36,19 +64,6 @@ npm i
 npm run dev
 ```
 
-**Edit a file directly in GitHub**
-
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
-
-**Use GitHub Codespaces**
-
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
 
 ## What technologies are used for this project?
 
@@ -60,14 +75,5 @@ This project is built with:
 - shadcn-ui
 - Tailwind CSS
 
-## How can I deploy this project?
 
-Simply open [Lovable](https://lovable.dev/projects/4bd29cfa-0447-49f7-907f-74cd66109b1d) and click on Share -> Publish.
 
-## Can I connect a custom domain to my Lovable project?
-
-Yes, you can!
-
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
-
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/features/custom-domain#custom-domain)
