@@ -7,9 +7,11 @@ import { Truck } from "lucide-react";
 
 const Index = () => {
   const [tripData, setTripData] = useState<any>(null);
+  const [tripUpdateTrigger, setTripUpdateTrigger] = useState<number>(0);
 
   const handleTripPlanned = (data: any) => {
     setTripData(data);
+    setTripUpdateTrigger(prev => prev + 1); // Increment trigger to force update
   };
 
   return (
@@ -52,7 +54,7 @@ const Index = () => {
         {/* Map View */}
         {tripData && (
           <div className="mb-6">
-            <MapView route={tripData.route} stops={tripData.stops} />
+            <MapView route={tripData.route} updateTrigger={tripUpdateTrigger} />
           </div>
         )}
 

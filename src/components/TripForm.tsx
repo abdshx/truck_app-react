@@ -54,15 +54,18 @@ export const TripForm = ({ onTripPlanned }: TripFormProps) => {
     try {
       // Geocode all addresses to coordinates
       let start, pickup, dropoff,first,two;
+       let teststart, testpickup, testdropoff;
+
+
       try {
         // Original geocoding calls (commented out)
-        /*
-        [start, pickup, dropoff] = await Promise.all([
+        
+        [teststart, testpickup, testdropoff] = await Promise.all([
           geocodeAddress(formData.currentLocation),
           geocodeAddress(formData.pickupLocation),
           geocodeAddress(formData.dropoffLocation)
         ]);
-        */
+        
       
         // Hardcoded coordinates instead of geocoding
         start = { lat: 31.5820, lng: 74.3294 };     // Lahore city center
@@ -86,11 +89,6 @@ export const TripForm = ({ onTripPlanned }: TripFormProps) => {
           dropoff,
           hours_used: parseFloat(formData.cycleHoursUsed)
         });
-
-        
-         
-
-        
         onTripPlanned(data);
         
         toast({
@@ -108,6 +106,13 @@ export const TripForm = ({ onTripPlanned }: TripFormProps) => {
     } finally {
       setIsLoading(false);
     }
+
+
+
+
+    // API CALL FOR MAKING STOPS
+
+    
   };
 
   const handleChange = (field: string, value: string) => {

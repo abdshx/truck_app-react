@@ -3,10 +3,15 @@ import { MapContainer, TileLayer, Marker, Popup, Polyline, useMap } from "react-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import "leaflet/dist/leaflet.css";
 import L from "leaflet";
-
+import {useState} from 'react'
 // Fix for default marker icons in react-leaflet
 import icon from "leaflet/dist/images/marker-icon.png";
 import iconShadow from "leaflet/dist/images/marker-shadow.png";
+import axios from "axios"
+
+
+
+import { toast, useToast } from "@/hooks/use-toast";
 
 const DefaultIcon = L.icon({
   iconUrl: icon,
@@ -32,13 +37,14 @@ interface MapViewProps {
     bbox?: [number, number, number, number];
     metadata?: Record<string, any>;
   };
-  stops: Array<{
-    type: string;
-    location: string;
-    duration: number;
-    day: number;
-    coordinates: [number, number];
-  }>;
+  // stops: Array<{
+  //   type: string;
+  //   location: string;
+  //   duration: number;
+  //   day: number;
+  //   coordinates: [number, number];
+  // }>;
+  updateTrigger?: number; // Optional prop that triggers updates
 }
 
 const MapController = ({ center }: { center: [number, number] }) => {
@@ -51,21 +57,69 @@ const MapController = ({ center }: { center: [number, number] }) => {
   return null;
 };
 
-export const MapView = ({ route, stops }: MapViewProps) => {
+export const MapView = ({ route,updateTrigger = 0 }: MapViewProps) => {
 
 
-  //console.log(route)
+  const [sto, setStops] = useState<Array<{
+    type: string;
+    coordinates: [number, number];
+  }>>([]);
 
+  console.log("MapView rendered with route:", route?.features?.[0]?.geometry?.coordinates?.length);
+   
   const coords:[number,number][] =
   route?.features?.[0]?.geometry?.coordinates?.map(
     ([lng, lat]: [number, number]) => [lat, lng]
   ) || [];
 
+  useEffect(() => {
+    const fetchStops = async () => {
+      console.log("useEffect triggered with coords length:", coords.length);
+
+      if (!coords || coords.length === 0) {
+        console.log("No coordinates available, skipping fetchStops");
+        return;
+      }
+    
+      try {
+        console.log("Calling makeStops API with coords:", coords.length);
+        const response = await axios.post("http://127.0.0.1:8000/api/makeStops/", {
+          coords: coords
+        });
+        
+        console.log("makeStops API response:", response.data);
+        setStops(response.data);
+        toast({
+          title: "Stops Generated Successfully",
+          description: "Your stops have been calculated along the route.",
+        });
+      } catch (apiErr: any) {
+        console.error("makeStops API error:", apiErr);
+        toast({
+          title: "Backend request failed",
+          description: apiErr?.message || "Could not generate stops.",
+          variant: "destructive",
+        });
+      }
+    };
+  
+    fetchStops();
+  }, [updateTrigger]); // Only run when updateTrigger changes
+  
+
+
+  
+
   const centerCoordinates: [number, number] =
   coords.length > 0 ? coords[0] : [37.7749, -122.4194];
 
 
-   coords.map((coords)=>{return console.log(coords);})
+  //coords.map((coords)=>{return console.log(coords);})
+
+
+   
+   
+  
   // INITIAL COORDINATES FOR THE MAP TO START AT
   // const centerCoordinates: [number, number] = route.coordinates[0]
   //   ? [route.coordinates[0][1], route.coordinates[0][0]]
@@ -127,9 +181,9 @@ export const MapView = ({ route, stops }: MapViewProps) => {
               {...{ pathOptions: { color: "#2563eb", weight: 4, opacity: 0.7 } } as any}
             />
 
-            {/* {stops.map((stop, index) => {
-              const markerIcon = createCustomIcon(stop.type);
-              const position: [number, number] = [stop.coordinates[1], stop.coordinates[0]];
+            {sto?.map((stop, index) => {
+              const markerIcon = createCustomIcon(stop?.type);
+              const position: [number, number] = [stop?.coordinates[0], stop?.coordinates[1]];
               return (
                 <Marker
                   key={index}
@@ -138,14 +192,14 @@ export const MapView = ({ route, stops }: MapViewProps) => {
                 >
                   <Popup>
                     <div className="text-sm">
-                      <p className="font-semibold">{stop.type}</p>
-                      <p className="text-muted-foreground">{stop.location}</p>
-                      <p className="text-xs">Day {stop.day} - {stop.duration}h</p>
+                      <p className="font-semibold">{stop?.type}</p>
+                      {/* <p className="text-muted-foreground">{stop.location}</p>
+                      <p className="text-xs">Day {stop.day} - {stop.duration}h</p> */}
                     </div>
                   </Popup>
                 </Marker>
               );
-            })} */}
+            })}
           </MapContainer>
         </div>
       </CardContent>
